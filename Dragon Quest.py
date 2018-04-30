@@ -4,8 +4,8 @@ import math
 import random
 
 #set function for basic roll
-def roll():
-    return random.randrange(1,20)
+def roll(modifier):
+    return random.randrange(1,20)+modifier
 
 
 class creature():
@@ -25,12 +25,12 @@ class creature():
 
     #set function to roll for initiative
     def roll_initiative(self):
-        initiative = roll() + self.ini
+        initiative = roll(self.ini)
         return initiative
 
-    #set function for attack. Use variable for attack roll 
+    #set function for attack. If the attack is successful, will call to roll damage.  If unsucessful pass turn.
     def roll_attack(self, defender):
-        attack = roll() + self.atk
+        attack = roll(self.atk)
         print(self.name, "attacks: ", attack)
         if attack >= defender.ac:
             print("Hit")
@@ -39,7 +39,7 @@ class creature():
             print("Miss")
             return False
     
-    #set function for rolling damage
+    #set function for rolling damage.Print out damage total and deduct from creature's HP
     def roll_damage(self, defender):
        damage = random.randrange(1,self.dmg)
        print(self.name, "deals", damage, "damage!")
@@ -57,37 +57,33 @@ def death_check(defender):
         print(defender.name, "HP: ", defender.hp)
         return True
 
+#function to call attack sequence.  If an attach meets or beats the opponen't ac roll for damage and check to see if the defender lived.
 def attack(attacker, defender):
     if attacker.roll_attack(defender) == True:
         attacker.roll_damage(defender)
         death_check(defender)
 
 def initiative(creature):
-    return creature.initiative()
+    return creature.roll_initiative(roll_initiative(self.ini))
 
-dragon = creature('Dragon', 90, 20, 10, 15, 1, 'opp')
-knight = creature('Knight', 45, 25, 10, 8, 4,'opp')
-squire = creature('Squire', 25, 15, 8, 8, 6,'opp')
+#create list of creatures to do combat
+creatures = [creature('Dragon', 90, 20, 10, 15, 1, 'knight'),
+             creature('Knight', 45, 25, 10, 8, 4,'dragon'),
+             creature('Squire', 25, 15, 8, 8, 6,'dragon')]
 
-combatant = [dragon, knight, squire]
+def getCreature():
+    return creature.initiative
 
-dragon.opponent = knight
-knight.opponent = dragon
-squire.opponent = dragon
-
-print(len(combatant))
-print(combatant)
+sorted(creatures, key=getCreature())
 
 #Combat sequence
 turn = 0
 while dragon.hp > 0 and knight.hp > 0:
     turn = turn + 1
-
-#    for i in range(len(combatant)):
-#        combatant[i].initiative = combatant[i].roll_initiative
-        
-    combatants = sorted(combatant, key=lambda combatant: combatant.initiative)
+    print("Turn", turn)
     for i in range(len(combatants)):
-        attack(combatants[i], combatants[i].opponent)
-        
-print(turn)
+        if creature[i].hp > 0:
+            attack(combatants[i], combatants[i].opponent)
+        else:
+            break
+    print()
