@@ -67,23 +67,21 @@ def initiative(creature):
     return creature.roll_initiative(roll_initiative(self.ini))
 
 #create list of creatures to do combat
-creatures = [creature('Dragon', 90, 20, 10, 15, 1, 'knight'),
-             creature('Knight', 45, 25, 10, 8, 4,'dragon'),
-             creature('Squire', 25, 15, 8, 8, 6,'dragon')]
+creatures = [creature('Dragon', 90, 20, 10, 15, 1),
+             creature('Knight', 45, 25, 10, 8, 4),
+             creature('Squire', 25, 15, 8, 8, 6)
+             ]
 
-def getCreature():
-    return creature.initiative
-
-sorted(creatures, key=getCreature())
-
+print(creatures)
 #Combat sequence
 turn = 0
-while dragon.hp > 0 and knight.hp > 0:
+fighting = True
+while fighting == True:
     turn = turn + 1
     print("Turn", turn)
-    for i in range(len(combatants)):
-        if creature[i].hp > 0:
-            attack(combatants[i], combatants[i].opponent)
+    for i in range(len(creatures)):
+        if creatures[i].hp > 0:
+            attack(creatures[i], creatures[i])
         else:
             break
     print()
