@@ -3,10 +3,12 @@ import os
 import math
 import random
 
+from operator import itemgetter, attrgetter
+
 global monters
 monsters = []
-global heros
-heros = []
+global heroes
+heroes = []
 
 #set function for basic roll expected to pass object modifier as arguement
 def roll(modifier):
@@ -23,6 +25,8 @@ class creature():
         self.dmg = dmg
         self.ini = ini
         self.creatureType = ct
+        self.initiative = roll(ini)
+        
 
     #function to get Name attribute
     def get_name(self):
@@ -62,64 +66,87 @@ class creature():
                     teamMonsters = teamMonsters - 1
                     print(teamMonsters, "monsters remain")
                 else:
-                    global heros
+                    global heroes
                     print("Our ", defender.get_name(), ' has perished.')
-                    global teamHeros
-                    teamHeros = teamHeros - 1
-                    print(teamHeros, "heros remain")
+                    global teamHeroes
+                    teamHeroes = teamHeroes - 1
+                    print(teamHeroes, "heroes remain")
+                print()
             else:
                 print(defender.name, "HP: ", defender.hp)
 
         if roll_attack(self, defender) == True:
             roll_damage(self, defender)
 
-
-#function to retrive attribue
-def getName():
-    return self.name
-
     #function to create initiative score for creature
     def roll_initiative():
         self.initiativeScore = roll(self.ini)
 
-#create list of creatures to do combat
+#create list of creatures to do combat: name, hp, ac, atk, dmg, ini, ct
 creatures = [
             creature('Frick', 35, 20, 10, 15, 1, 'monster'),
             creature('Frack', 35, 20, 10, 15, 1, 'monster'),
-            creature('Knight', 45, 25, 10, 8, 4, 'hero'),
-            creature('Squire', 25, 15, 8, 8, 6, 'hero'),
-            creature('Fighter', 35, 20, 10, 10, 2, 'hero')
+            creature('Frook', 35, 20, 10, 15, 1, 'monster'),
+            creature('Knight',35, 20, 10, 15, 1, 'hero'),
+            creature('Squire', 35, 20, 10, 15, 1, 'hero'),
+            creature('Fighter', 35, 20, 10, 15, 1, 'hero')
             ]
 
+def getInitiative(l):
+    for c in range(len(l)):
+        return int(l[c].initiative)
+    
 for i in range(len(creatures)):
     if creatures[i].creatureType == 'monster':
         monsters.append(creatures[i])
     elif creatures[i].creatureType == 'hero':
-        heros.append(creatures[i])
+        heroes.append(creatures[i])
           
 print(monsters)
-print(heros)
+print(heroes)
 print()
 
 #Combat sequence
 teamMonsters = len(monsters)
-teamHeros = len(heros)
+teamHeroes = len(heroes)
 turn = 0
-while teamMonsters > 0 and teamHeros > 0:
+while teamMonsters > 0 and teamHeroes > 0:
+    print('------------------------------------------')
     turn = turn + 1
-    print()
-    print("Turn;", turn)
+    print("Turn:", turn)
+
+    #create sequence for initiative
     for i in range(len(creatures)):
-        if creatures[i].hp > 0:
+        creatures[i].initiative = roll(creatures[i].ini)
+    combatSequence = sorted(creatures, key = attrgetter('initiative'), reverse = True)
+
+    #print out the initiative list of current participants
+    for p in range(len(combatSequence)):
+        if creatures[p].hp > 0:
+            print(creatures[p].name, creatures[p].initiative)
+    print()
+
+    #run combat loop for combatants
+    for i in range(len(combatSequence)):
+        #check to see if character is alive to attack
+        if combatSequence[i].hp > 0:
+            #select opponent who doesn't share the same creatureType and is still alive
             for o in range(len(creatures)):
-                if creatures[o].creatureType != creatures[i].creatureType and creatures[o].hp > 0:
-                    creatures[i].attack(creatures[o])
+                if creatures[o].creatureType != combatSequence[i].creatureType and creatures[o].hp > 0:
+                    #call attack function and move on to next participant.
+                    combatSequence[i].attack(creatures[o])
                     break
 
-if teamMonsters == 0:
-    print("The day has been won.  Hip Hip Hooray!")
-    print(heros)
-elif teamHeros == 0:
-    print("All of our heros have follen.  Run you fool!")
-    print(monsters)
+    #set victory terms and break from comabt loop
+    if teamMonsters == 0:
+        print("The day has been won.  Hip Hip Hooray!")
+        print()
+        print(heroes)
+        break
+    elif teamHeroes == 0:
+        print("All of our heros have follen.  Run you fool!")
+        print()
+        print(monsters)
+        break
 
+#End program
