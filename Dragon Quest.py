@@ -1,4 +1,4 @@
-#D&D combat program will run simulated combat for basic D&D type game.
+#D&D combat program will run simulated combat for basic D&D type game.
 import os
 import math
 import random
@@ -34,7 +34,7 @@ class creature():
 
     #representation of object
     def __repr__(self):
-        return '{} Name:{} HP:{} Attack:{} Damage{}\n'.format(self.creatureType, self.name, self.hp, self.atk, self.dmg)
+        return '\n{} Name:{} HP:{} Attack:{} Damage{}'.format(self.creatureType, self.name, self.hp, self.atk, self.dmg)
 
     #function to call attack sequence.  If an attach meets or beats the opponen't ac roll for damage and check to see if the defender lived.
     def attack(self, defender):
@@ -65,22 +65,21 @@ class creature():
                     global teamMonsters
                     teamMonsters = teamMonsters - 1
                     print(teamMonsters, "monsters remain")
+                    monsters.remove(defender)
                 else:
                     global heroes
                     print("Our ", defender.get_name(), ' has perished.')
                     global teamHeroes
                     teamHeroes = teamHeroes - 1
                     print(teamHeroes, "heroes remain")
+                    heroes.remove(defender)
+                creatures.remove(defender)
                 print()
             else:
                 print(defender.name, "HP: ", defender.hp)
 
         if roll_attack(self, defender) == True:
             roll_damage(self, defender)
-
-    #function to create initiative score for creature
-    def roll_initiative():
-        self.initiativeScore = roll(self.ini)
 
 #create list of creatures to do combat: name, hp, ac, atk, dmg, ini, ct
 creatures = [
@@ -91,10 +90,6 @@ creatures = [
             creature('Squire', 35, 20, 10, 15, 1, 'hero'),
             creature('Fighter', 35, 20, 10, 15, 1, 'hero')
             ]
-
-def getInitiative(l):
-    for c in range(len(l)):
-        return int(l[c].initiative)
     
 for i in range(len(creatures)):
     if creatures[i].creatureType == 'monster':
@@ -110,7 +105,7 @@ print()
 teamMonsters = len(monsters)
 teamHeroes = len(heroes)
 turn = 0
-while teamMonsters > 0 and teamHeroes > 0:
+while len(monsters) > 0 and len(heroes) > 0:
     print('------------------------------------------')
     turn = turn + 1
     print("Turn:", turn)
@@ -128,25 +123,25 @@ while teamMonsters > 0 and teamHeroes > 0:
 
     #run combat loop for combatants
     for i in range(len(combatSequence)):
-        #check to see if character is alive to attack
         if combatSequence[i].hp > 0:
             #select opponent who doesn't share the same creatureType and is still alive
-            for o in range(len(creatures)):
-                if creatures[o].creatureType != combatSequence[i].creatureType and creatures[o].hp > 0:
-                    #call attack function and move on to next participant.
-                    combatSequence[i].attack(creatures[o])
+            if combatSequence[i].creatureType == 'hero':
+                try:
+                    combatSequence[i].attack(random.choice(monsters))
+                except:
+                    break
+            elif combatSequence[i].creatureType == 'monster':
+                try:
+                    combatSequence[i].attack(random.choice(heroes))
+                except:
                     break
 
-    #set victory terms and break from comabt loop
-    if teamMonsters == 0:
-        print("The day has been won.  Hip Hip Hooray!")
-        print()
-        print(heroes)
-        break
-    elif teamHeroes == 0:
-        print("All of our heros have follen.  Run you fool!")
-        print()
-        print(monsters)
-        break
+if teamHeroes == 0:
+    print("All of our heroes have follen.  Run you fool!")
+elif teamMonsters == 0:
+     print("Our heroes are victorious! Hazzah!")
+print()
+print(creatures)
+
 
 #End program
