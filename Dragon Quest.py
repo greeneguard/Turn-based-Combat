@@ -5,6 +5,8 @@ import random
 
 from operator import itemgetter, attrgetter
 
+OpenF = open("dragonquest.txt", "w")
+
 global monters
 monsters = []
 global heroes
@@ -42,17 +44,17 @@ class creature():
         #set function for attack. If the attack is successful, will call to roll damage.  If unsucessful pass turn.
         def roll_attack(self, defender):
             attack = roll(self.atk)
-            print(self.name, "attacks", defender.name)
+            print(self.name, "attacks", defender.name, file=open("dragonquest.txt", "a"))
             if attack >= defender.ac:
                 return True
             else:
-                print("Miss")
+                print("Miss", file=open("dragonquest.txt", "a"))
                 return False
 
         #set function for rolling damage.Print out damage total and deduct from creature's HP
         def roll_damage(self, defender):
             damage = random.randrange(1,self.dmg)
-            print(self.name, "deals", damage, "damage!")
+            print(self.name, "deals", damage, "damage!", file=open("dragonquest.txt", "a"))
             defender.hp = defender.hp - damage
             death_check(defender)
 
@@ -61,22 +63,22 @@ class creature():
             if defender.hp <= 0:
                 if defender.creatureType == "monster":
                     global monsters
-                    print("The", defender.get_name(), " is vanquished!")
+                    print("The", defender.get_name(), " is vanquished!", file=open("dragonquest.txt", "a"))
                     global teamMonsters
                     teamMonsters = teamMonsters - 1
-                    print(teamMonsters, "monsters remain")
+                    print(teamMonsters, "monsters remain", file=open("dragonquest.txt", "a"))
                     monsters.remove(defender)
                 else:
                     global heroes
-                    print("Our ", defender.get_name(), ' has perished.')
+                    print("Our ", defender.get_name(), ' has perished.', file=open("dragonquest.txt", "a"))
                     global teamHeroes
                     teamHeroes = teamHeroes - 1
-                    print(teamHeroes, "heroes remain")
+                    print(teamHeroes, "heroes remain", file=open("dragonquest.txt", "a"))
                     heroes.remove(defender)
                 creatures.remove(defender)
-                print()
+
             else:
-                print(defender.name, "HP: ", defender.hp)
+                print(defender.name, "HP: ", defender.hp, file=open("dragonquest.txt", "a"))
 
         if roll_attack(self, defender) == True:
             roll_damage(self, defender)
@@ -97,18 +99,17 @@ for i in range(len(creatures)):
     elif creatures[i].creatureType == 'hero':
         heroes.append(creatures[i])
           
-print(monsters)
-print(heroes)
-print()
+print(monsters, file=open("dragonquest.txt", "a"))
+print(heroes, file=open("dragonquest.txt", "a"))
 
 #Combat sequence
 teamMonsters = len(monsters)
 teamHeroes = len(heroes)
 turn = 0
 while len(monsters) > 0 and len(heroes) > 0:
-    print('------------------------------------------')
+    print('------------------------------------------', file=open("dragonquest.txt", "a"))
     turn = turn + 1
-    print("Turn:", turn)
+    print("Turn:", turn, file=open("dragonquest.txt", "a"))
 
     #create sequence for initiative
     for i in range(len(creatures)):
@@ -118,8 +119,7 @@ while len(monsters) > 0 and len(heroes) > 0:
     #print out the initiative list of current participants
     for p in range(len(combatSequence)):
         if creatures[p].hp > 0:
-            print(creatures[p].name, creatures[p].initiative)
-    print()
+            print(creatures[p].name, creatures[p].initiative, file=open("dragonquest.txt", "a"))
 
     #run combat loop for combatants
     for i in range(len(combatSequence)):
@@ -137,11 +137,12 @@ while len(monsters) > 0 and len(heroes) > 0:
                     break
 
 if teamHeroes == 0:
-    print("All of our heroes have follen.  Run you fool!")
+    print("Our heroes have fallen")
+    print("All of our heroes have fallen.  Run you fool!", file=open("dragonquest.txt", "a"))
 elif teamMonsters == 0:
-     print("Our heroes are victorious! Hazzah!")
-print()
-print(creatures)
+    print("Our heroes are victorious")
+    print("Our heroes are victorious! Hazzah!", file=open("dragonquest.txt", "a"))
 
+print(creatures, file=open("dragonquest.txt", "a"))
 
 #End program
